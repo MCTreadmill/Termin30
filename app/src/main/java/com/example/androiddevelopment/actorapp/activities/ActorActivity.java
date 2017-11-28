@@ -10,6 +10,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
@@ -23,16 +25,20 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.androiddevelopment.actorapp.R;
+import com.example.androiddevelopment.actorapp.adapters.DrawerAdapter;
 import com.example.androiddevelopment.actorapp.db.ORMLightHelper;
 import com.example.androiddevelopment.actorapp.db.model.Actor;
 import com.example.androiddevelopment.actorapp.dialogs.AboutDialog;
+import com.example.androiddevelopment.actorapp.model.NavigationItem;
 import com.example.androiddevelopment.actorapp.preferences.PreferenceClass;
 import com.j256.ormlite.android.apptools.OpenHelperManager;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,6 +55,14 @@ public class ActorActivity extends AppCompatActivity{
 
     public static String NOTIF_TOAST = "notif_toast";
     public static String NOTIF_STATUS = "notif_status";
+
+    // Attributes used by NavigationDrawer
+    private DrawerLayout drawerLayout;
+    private ListView drawerList;
+    private ActionBarDrawerToggle drawerToggle;
+    private RelativeLayout drawerPane;
+    private CharSequence drawerTitle;
+    private ArrayList<NavigationItem> drawerItems = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +99,60 @@ public class ActorActivity extends AppCompatActivity{
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        // Manages NavigationDrawer
+
+        // Populates a list of NavigationDrawer items
+        drawerItems.add(new NavigationItem("Settings", "Adjust some Preferences", R.drawable.ic_settings));
+        drawerItems.add(new NavigationItem("About", "Learn about the author", R.drawable.ic_about));
+
+        drawerTitle = getTitle();
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
+        drawerList = (ListView) findViewById(R.id.navList);
+
+        //Populates NavigtionDrawer with options
+        drawerPane = (RelativeLayout) findViewById(R.id.drawerPane);
+        DrawerAdapter adapter = new DrawerAdapter(this, drawerItems);
+
+        drawerList.setAdapter(adapter);
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    Intent settings = new Intent(ActorActivity.this, PreferenceClass.class);
+                    startActivity(settings);
+                }
+                if (position == 1) {
+                    android.support.v7.app.AlertDialog alertDialog = new AboutDialog(ActorActivity.this).prepareDialog();
+                    alertDialog.show();
+                }
+            }
+        });
+
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close) {
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                getSupportActionBar().setTitle(drawerTitle);
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                getSupportActionBar().setTitle(drawerTitle);
+                invalidateOptionsMenu();    // Creates call to onPrepareOptionsMenu()
+            }
+        };
     }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        drawerToggle.syncState();
+    }
+
 
     @Override
     protected void onResume() {
