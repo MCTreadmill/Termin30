@@ -1,6 +1,8 @@
 package com.example.androiddevelopment.actorapp.db.model;
 
+import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.ForeignCollectionField;
 import com.j256.ormlite.table.DatabaseTable;
 
 import java.util.Date;
@@ -29,16 +31,18 @@ public class Actor {
     private String mName;
 
     @DatabaseField(columnName = FIELD_NAME_DESCRIPTION)
-    private String description;
+    private String mDescription;
 
     @DatabaseField(columnName = FIELD_NAME_RATING)
-    private float rating;
+    private Float mRating;
 
     @DatabaseField(columnName = FIELD_NAME_DATE)
-    private Date date;
+    private String mDate;
 
-    @DatabaseField(columnName = FIELD_NAME_MOVIES)
-    private List<Movie> movies;
+    //Don't forget to changed from databasefield to foreigncollectionfield in order
+    //for ormlight to understand where to store field movie
+    @ForeignCollectionField(columnName = FIELD_NAME_MOVIES, eager = true)
+    private ForeignCollection<Movie> movies;
 
     public Actor(){
 
@@ -60,35 +64,40 @@ public class Actor {
         this.mName = mName;
     }
 
-    public String getDescription() {
-        return description;
+    public String getmDescription() {
+        return mDescription;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setmDescription(String mDescription) {
+        this.mDescription = mDescription;
     }
 
-    public float getRating() {
-        return rating;
+    public Float getmRating() {
+        return mRating;
     }
 
-    public void setRating(float rating) {
-        this.rating = rating;
+    public void setmRating(Float mRating) {
+        this.mRating = mRating;
     }
 
-    public Date getDate() {
-        return date;
+    public String getmDate() {
+        return mDate;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setmDate(String mDate) {
+        this.mDate = mDate;
     }
 
-    public List<Movie> getMovies() {
+    public ForeignCollection<Movie> getMovies() {
         return movies;
     }
 
-    public void setMovies(List<Movie> movies) {
+    public void setMovies(ForeignCollection<Movie> movies) {
         this.movies = movies;
+    }
+
+    @Override
+    public String toString() {
+        return mName;
     }
 }

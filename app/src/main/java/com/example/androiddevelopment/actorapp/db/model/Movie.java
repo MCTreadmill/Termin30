@@ -22,8 +22,8 @@ public class Movie {
     @DatabaseField(columnName = FIELD_NAME_NAME)
     private String mName;
 
-    @DatabaseField(columnName = FIELD_NAME_ACTOR)
-    private Actor actor;
+    @DatabaseField(columnName = FIELD_NAME_ACTOR, foreign = true, foreignAutoRefresh = true)
+    private Actor mActor;
 
     public Movie() {
 
@@ -45,11 +45,16 @@ public class Movie {
         this.mName = mName;
     }
 
-    public Actor getActor() {
-        return actor;
+    public Actor getmActor() {
+        return mActor;
     }
 
-    public void setActor(Actor actor) {
-        this.actor = actor;
+    public void setmActor(Actor mActor) {
+        this.mActor = mActor;
+    }
+
+    @Override
+    public String toString() {
+        return mName;
     }
 }
