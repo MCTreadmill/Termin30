@@ -1,8 +1,15 @@
 package com.example.androiddevelopment.actorapp.activities;
 
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +33,9 @@ import com.j256.ormlite.android.apptools.OpenHelperManager;
 import java.sql.SQLException;
 import java.util.List;
 
+import static com.example.androiddevelopment.actorapp.activities.ActorActivity.NOTIF_STATUS;
+import static com.example.androiddevelopment.actorapp.activities.ActorActivity.NOTIF_TOAST;
+
 /**
  * Created by androiddevelopment on 20.11.17..
  */
@@ -34,6 +44,8 @@ public class DetailActivity extends AppCompatActivity {
 
     private ORMLightHelper databaseHelper;
     private Actor actor;
+    private SharedPreferences prefs;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +58,8 @@ public class DetailActivity extends AppCompatActivity {
         if(toolbar != null) {
             setSupportActionBar(toolbar);
         }
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         int key = getIntent().getExtras().getInt(ActorActivity.ACTOR_KEY);
 
@@ -165,6 +179,8 @@ public class DetailActivity extends AppCompatActivity {
 
                         refresh();
 
+                        showMessage("New movie added to actor");
+
                         dialog.dismiss();
                     }
                 });
@@ -194,16 +210,7 @@ public class DetailActivity extends AppCompatActivity {
                         try {
                             getDatabaseHelper().getActorDao().update(actor);
 
-                            //checking preferences
-                            //boolean toast = prefs.getBoolean(NOTIF_TOAST, false);
-                            //boolean status = prefs.getBoolean(NOTIF_STATUS, false);
-                            /*if (toast){
-                                Toast.makeText(PripremaListActivity.this, "Added new actor", Toast.LENGTH_SHORT).show();
-                            }
-
-                            if (status){
-                                showStatusMesage("Added new actor");
-                            }*/
+                            showMessage("Actor detail updated");
 
                             //REFRESH
                             refresh();
@@ -222,6 +229,7 @@ public class DetailActivity extends AppCompatActivity {
             case R.id.remove_actor:
                 try {
                     getDatabaseHelper().getActorDao().delete(actor);
+                    showMessage("Actor deleted");
                     finish();
                 } catch (SQLException e) {
                     e.printStackTrace();
@@ -233,22 +241,31 @@ public class DetailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /*
-                break;
-            case R.id.priprema_remove:
-                try {
-                    getDatabaseHelper().getActorDao().delete(a);
+    private void showStatusMesage(String message){
+        NotificationManager mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.ic_notification_small);
+        mBuilder.setContentTitle("Pripremni test");
+        mBuilder.setContentText(message);
 
-                    showMessage("Actor deleted");
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification_big);
 
-                    finish(); //moramo pozvati da bi se vratili na prethodnu aktivnost
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                break;
+        mBuilder.setLargeIcon(bm);
+        // notificationID allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
+    }
+
+    private void showMessage(String message){
+        //provera podesenja
+        boolean toast = prefs.getBoolean(NOTIF_TOAST, false);
+        boolean status = prefs.getBoolean(NOTIF_STATUS, false);
+
+        if (toast){
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         }
 
-        return super.onOptionsItemSelected(item);
+        if (status){
+            showStatusMesage(message);
+        }
     }
-     */
 }

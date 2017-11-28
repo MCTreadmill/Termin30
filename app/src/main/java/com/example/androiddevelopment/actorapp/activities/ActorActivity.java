@@ -2,9 +2,16 @@ package com.example.androiddevelopment.actorapp.activities;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.Toast;
 
 import com.example.androiddevelopment.actorapp.R;
 import com.example.androiddevelopment.actorapp.db.ORMLightHelper;
@@ -34,7 +42,13 @@ import java.util.List;
 public class ActorActivity extends AppCompatActivity{
 
     private ORMLightHelper databaseHelper;
+
     public static String ACTOR_KEY = "ACTOR_KEY";
+
+    private SharedPreferences prefs;
+
+    public static String NOTIF_TOAST = "notif_toast";
+    public static String NOTIF_STATUS = "notif_status";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +61,8 @@ public class ActorActivity extends AppCompatActivity{
         if(toolbar != null) {
             setSupportActionBar(toolbar);
         }
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         final ListView listView = (ListView) findViewById(R.id.lv_activity_actor);
 
@@ -99,6 +115,21 @@ public class ActorActivity extends AppCompatActivity{
         }
     }
 
+    private void showStatusMesage(String message){
+        NotificationManager mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.ic_notification_small);
+        mBuilder.setContentTitle("Pripremni test");
+        mBuilder.setContentText(message);
+
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification_big);
+
+        mBuilder.setLargeIcon(bm);
+        // notificationID allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.actor_menu, menu);
@@ -132,15 +163,15 @@ public class ActorActivity extends AppCompatActivity{
                             getDatabaseHelper().getActorDao().create(actor);
 
                             //checking preferences
-                            //boolean toast = prefs.getBoolean(NOTIF_TOAST, false);
-                            //boolean status = prefs.getBoolean(NOTIF_STATUS, false);
-                            /*if (toast){
-                                Toast.makeText(PripremaListActivity.this, "Added new actor", Toast.LENGTH_SHORT).show();
+                            boolean toast = prefs.getBoolean(NOTIF_TOAST, false);
+                            boolean status = prefs.getBoolean(NOTIF_STATUS, false);
+                            if (toast){
+                                Toast.makeText(ActorActivity.this, "Added new actor", Toast.LENGTH_SHORT).show();
                             }
 
                             if (status){
                                 showStatusMesage("Added new actor");
-                            }*/
+                            }
 
                             //REFRESH
                             refresh();

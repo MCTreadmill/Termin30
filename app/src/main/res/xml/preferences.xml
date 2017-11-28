@@ -13,7 +13,7 @@
 
         <CheckBoxPreference
             android:defaultValue="false"
-            android:key="notif_statis"
+            android:key="notif_status"
             android:summary="Show notification as Statusbar message"
             android:title="Statusbar notification" />
 
